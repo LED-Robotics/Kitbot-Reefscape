@@ -11,6 +11,7 @@
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/DutyCycleEncoder.h>
+#include <rev/SparkMax.h>
 #include <units/angular_velocity.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
@@ -19,19 +20,18 @@
 #include <units/velocity.h>
 #include <ctre/phoenix6/TalonFX.hpp>
 
-#include "GlobalConstants.h"
 #include "Constants.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
-using namespace DriveConstants;
+using namespace rev::spark;
 
 class SwerveModule {
     public:
         SwerveModule(hardware::TalonFX *drivingMotor, hardware::TalonFX *turningMotor);
         
-        // SwerveModule(hardware::TalonFX *drivingMotor, CANSparkMax *turningMotor, 
-        // DutyCycleEncoder *thetaEncoder);
+        SwerveModule(hardware::TalonFX *drivingMotor, SparkMax *turningMotor, 
+        DutyCycleEncoder *thetaEncoder, double thetaEncoderOffset = 0);
         /**
          * Gets the distance of the drive encoder.
          *
@@ -81,6 +81,10 @@ class SwerveModule {
          */
         void SetDesiredState(const frc::SwerveModuleState& state);
         /**
+         * Run one cycle of theta PID Controller. This should be run repeatedly while operational.
+         */
+        void RunPID();
+        /**
          * Debug function to set swerve drive motor using power.
          */
         void SetDrivePower(double power);
@@ -95,20 +99,23 @@ class SwerveModule {
 
     private:
 
-        double GetKrakenTurnPosition() const; 
-        // double GetNeoTurnPosition() const; 
+        double GetFalconTurnPosition() const; 
+        double GetNeoTurnPosition() const; 
 
-        void SetKrakenTurnPower(double power); 
-        // void SetNeoTurnPower(double power); 
+        void SetFalconTurnPower(double power); 
+        void SetNeoTurnPower(double power); 
 
         // motor references
+        bool usingFalcon = true;
         hardware::TalonFX *driveMotor;
-        hardware::TalonFX *turnMotor;
+        hardware::TalonFX *falconTurn;
         controls::VelocityVoltage velocity{0_tps};
         controls::PositionVoltage rotation{0_tr};
 
-        // CANSparkMax *neoTurn;
-        // DutyCycleEncoder *neoEncoder;
+        SparkMax *neoTurn;
+        DutyCycleEncoder *neoEncoder;
+        // Only for DutyCycle
+        double turnEncoderOffset = 0.0;
         // frc2::PIDController neoController{0.005, 0.0, 0.0}; off floor
-        // frc::PIDController neoController{0.007, 0.0, 0.0};
+        frc::PIDController neoController{0.007, 0.0, 0.0};
 };

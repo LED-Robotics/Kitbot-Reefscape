@@ -29,7 +29,7 @@
 
 using namespace frc;
 using namespace ctre::phoenix6;
-using namespace rev;
+using namespace rev::spark;
 using namespace DriveConstants;
 
 class DriveSubsystem : public frc2::SubsystemBase {
@@ -267,16 +267,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
   hardware::TalonFX frontRight;
 
   //Degree of wheel motors
-  hardware::TalonFX backLeftTheta;
-  hardware::TalonFX frontLeftTheta;
-  hardware::TalonFX backRightTheta;
-  hardware::TalonFX frontRightTheta;
+  SparkMax backLeftTheta;
+  SparkMax frontLeftTheta;
+  SparkMax backRightTheta;
+  SparkMax frontRightTheta;
 
   //Degree of wheel motors
-  hardware::CANcoder blCANCoder;
-  hardware::CANcoder flCANCoder;
-  hardware::CANcoder brCANCoder;
-  hardware::CANcoder frCANCoder;
+  DutyCycleEncoder blEncoder;
+  DutyCycleEncoder flEncoder;
+  DutyCycleEncoder brEncoder;
+  DutyCycleEncoder frEncoder;
 
   //Swerve motor groups
   SwerveModule s_backLeft;

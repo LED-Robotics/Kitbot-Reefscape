@@ -26,22 +26,22 @@ DriveSubsystem::DriveSubsystem(JetsonSubsystem *jetRef, int *targetRef)
       frontRight{kFrontRightPort, "canCan"},
 
       //Degree of wheel motors
-      backLeftTheta{kBackLeftThetaPort, "canCan"},
-      frontLeftTheta{kFrontLeftThetaPort, "canCan"},
-      backRightTheta{kBackRightThetaPort, "canCan"},
-      frontRightTheta{kFrontRightThetaPort, "canCan"},
+      backLeftTheta{kBackLeftThetaPort, SparkLowLevel::MotorType::kBrushed},
+      frontLeftTheta{kFrontLeftThetaPort, SparkLowLevel::MotorType::kBrushed},
+      backRightTheta{kBackRightThetaPort, SparkLowLevel::MotorType::kBrushed},
+      frontRightTheta{kFrontRightThetaPort, SparkLowLevel::MotorType::kBrushed},
 
       //Mag encoder motor controllers
-      blCANCoder{kBackLeftEncoderPort, "canCan"},
-      flCANCoder{kFrontLeftEncoderPort, "canCan"},
-      brCANCoder{kBackRightEncoderPort, "canCan"},
-      frCANCoder{kFrontRightEncoderPort, "canCan"},
+      blEncoder{kBackLeftEncoderPort},
+      flEncoder{kFrontLeftEncoderPort},
+      brEncoder{kBackRightEncoderPort},
+      frEncoder{kFrontRightEncoderPort},
 
       //Swerve group motors
-      s_backLeft{&backLeft, &backLeftTheta},
-      s_frontLeft{&frontLeft, &frontLeftTheta},
-      s_backRight{&backRight, &backRightTheta},
-      s_frontRight{&frontRight, &frontRightTheta},
+      s_backLeft{&backLeft, &backLeftTheta, &blEncoder, kBLeftMagPos},
+      s_frontLeft{&frontLeft, &frontLeftTheta, &flEncoder, kFLeftMagPos},
+      s_backRight{&backRight, &backRightTheta, &blEncoder, kBRightMagPos},
+      s_frontRight{&frontRight, &frontRightTheta, &frEncoder, kFRightMagPos},
 
       //Gryo
       gyro{0, "canCan"},
@@ -58,7 +58,6 @@ DriveSubsystem::DriveSubsystem(JetsonSubsystem *jetRef, int *targetRef)
         thetaTarget = targetRef;
 
         ConfigDriveMotors();
-        ConfigThetaMotors();
 
         SmartDashboard::PutBoolean("Limelight Targeting", targetUsingLimelight);
         SmartDashboard::PutNumber("offP", kPVelTurnOffset);
@@ -71,10 +70,10 @@ DriveSubsystem::DriveSubsystem(JetsonSubsystem *jetRef, int *targetRef)
 
 void DriveSubsystem::Periodic() {
   // Encoder Vals
-  // SmartDashboard::PutNumber("BL Abs", backLeftEncoder.GetAbsolutePosition());
-  // SmartDashboard::PutNumber("FL Abs", frontLeftEncoder.GetAbsolutePosition());
-  // SmartDashboard::PutNumber("BR Abs", backRightEncoder.GetAbsolutePosition());
-  // SmartDashboard::PutNumber("FR Abs", frontRightEncoder.GetAbsolutePosition());
+  // SmartDashboard::PutNumber("BL Abs", backLeftEncoder.Get());
+  // SmartDashboard::PutNumber("FL Abs", frontLeftEncoder.Get());
+  // SmartDashboard::PutNumber("BR Abs", backRightEncoder.Get());
+  // SmartDashboard::PutNumber("FR Abs", frontRightEncoder.Get());
 
   // SmartDashboard::PutNumber("BL Pos", (double)s_backLeft.GetTurnEncoderAngle());
   // SmartDashboard::PutNumber("FL Pos", (double)s_frontLeft.GetTurnEncoderAngle());
@@ -82,7 +81,12 @@ void DriveSubsystem::Periodic() {
   // SmartDashboard::PutNumber("FR Pos", (double)s_frontRight.GetTurnEncoderAngle());
 
   // SetThetaToHold({units::angle::degree_t{SmartDashboard::GetNumber("Theta Target", 0.0)}});
-  SmartDashboard::PutBoolean("Omega Override State", omegaOverride);
+   s_frontLeft.RunPID();
+   s_frontRight.RunPID();
+   s_backLeft.RunPID();
+   s_backRight.RunPID();
+
+   SmartDashboard::PutBoolean("Omega Override State", omegaOverride);
   targetUsingLimelight = SmartDashboard::GetBoolean("Limelight Targeting", targetUsingLimelight);
 
   odometry.Update(GetRotation(),
@@ -257,10 +261,6 @@ void DriveSubsystem::SetBrakeMode(bool state) {
   frontLeft.GetConfigurator().Apply(updated, 50_ms);
   backRight.GetConfigurator().Apply(updated, 50_ms);
   frontRight.GetConfigurator().Apply(updated, 50_ms);
-  backLeftTheta.GetConfigurator().Apply(updated, 50_ms);
-  frontLeftTheta.GetConfigurator().Apply(updated, 50_ms);
-  backRightTheta.GetConfigurator().Apply(updated, 50_ms);
-  frontRightTheta.GetConfigurator().Apply(updated, 50_ms);
 }
 
 double DriveSubsystem::GetPitch() {
@@ -332,40 +332,6 @@ void DriveSubsystem::ConfigDriveMotors() {
   frontLeft.GetConfigurator().Apply(driveConfig);
   backRight.GetConfigurator().Apply(driveConfig);
   frontRight.GetConfigurator().Apply(driveConfig);
-}
-
-void DriveSubsystem::ConfigThetaMotors() {
-  configs::TalonFXConfiguration turnConfig{};
-  turnConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
-  turnConfig.Slot0.kP = kTurnP;
-  turnConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::FusedCANcoder;
-  turnConfig.Feedback.RotorToSensorRatio = kTurnPRatio;
-  turnConfig.Feedback.SensorToMechanismRatio = 1.0;
-  turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-  turnConfig.Audio.AllowMusicDurDisable = true;
-  turnConfig.MotorOutput.Inverted = true;
-
-  turnConfig.Feedback.FeedbackRemoteSensorID = kBackLeftEncoderPort;
-  backLeftTheta.GetConfigurator().Apply(turnConfig);
-  turnConfig.Feedback.FeedbackRemoteSensorID = kFrontLeftEncoderPort;
-  frontLeftTheta.GetConfigurator().Apply(turnConfig);
-  turnConfig.Feedback.FeedbackRemoteSensorID = kBackRightEncoderPort;
-  backRightTheta.GetConfigurator().Apply(turnConfig);
-  turnConfig.Feedback.FeedbackRemoteSensorID = kFrontRightEncoderPort;
-  frontRightTheta.GetConfigurator().Apply(turnConfig);
-
-  configs::CANcoderConfiguration encoderConfig{};
-  encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
-  encoderConfig.MagnetSensor.SensorDirection = signals::SensorDirectionValue::Clockwise_Positive;
-  
-  encoderConfig.MagnetSensor.MagnetOffset = kBLeftMagPos;
-  blCANCoder.GetConfigurator().Apply(encoderConfig);
-  encoderConfig.MagnetSensor.MagnetOffset = kFLeftMagPos;
-  flCANCoder.GetConfigurator().Apply(encoderConfig);
-  encoderConfig.MagnetSensor.MagnetOffset = kBRightMagPos;
-  brCANCoder.GetConfigurator().Apply(encoderConfig);
-  encoderConfig.MagnetSensor.MagnetOffset = kFRightMagPos;
-  frCANCoder.GetConfigurator().Apply(encoderConfig);
 }
 
 void DriveSubsystem::ConfigAutonController() {

@@ -25,7 +25,6 @@
 
 #include "GlobalConstants.h"
 #include "SwerveModule.h"
-#include "subsystems/JetsonSubsystem/JetsonSubsystem.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
@@ -34,7 +33,7 @@ using namespace DriveConstants;
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
-  DriveSubsystem(JetsonSubsystem *jetRef, int *targetRef);
+  DriveSubsystem(int *targetRef);
 
     /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -235,7 +234,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   //shooter hack
   bool shooting = false;
-  JetsonSubsystem *jetson;
   double targetAngle;
   double difference;
   double angle;

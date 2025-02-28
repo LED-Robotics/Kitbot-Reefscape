@@ -24,10 +24,8 @@
 
 #include "GlobalConstants.h"
 
-#include "subsystems/AlgaeSubsystem/AlgaeSubsystem.h"
 #include "subsystems/DriveSubsystem/DriveSubsystem.h"
 #include "subsystems/CascadeSubsystem/CascadeSubsystem.h"
-#include "subsystems/CoralSubsystem/CoralSubsystem.h"
 #include "subsystems/LEDSubsystem/LEDSubsystem.h"
 
 #include <frc2/command/SequentialCommandGroup.h>
@@ -102,21 +100,21 @@ class RobotContainer {
   int TrackingTarget = GlobalConstants::kCoralMode;
   
   // The robot's subsystems
-  AlgaeSubsystem algae{};
+  // AlgaeSubsystem algae{};
 
-  DriveSubsystem m_drive{&jetson, &TrackingTarget};
+  DriveSubsystem m_drive{&TrackingTarget};
   
-  CascadeSubsystem cascade{};
+  // CascadeSubsystem cascade{};
 
   // ClimbSubsystem climb{};
 
-  CoralSubsystem coral{};
+  // CoralSubsystem coral{};
 
   // FunnelSubsystem funnel{};
 
   // FloorSubsystem floor{};
 
-  LEDSubsystem led{};
+  // LEDSubsystem led{};
 
   // used for AprilTag odom updates
   units::degree_t startOffset{180.0};
@@ -165,7 +163,9 @@ class RobotContainer {
 
   // Trigger odom update on flag
   frc2::Trigger odomTrigger{[this]() { 
-    return jetson.IsPoseAvailable(); }};
+    // return jetson.IsPoseAvailable();
+      return false;
+    }};
 
   frc2::CommandPtr toggleFieldCentric{frc2::cmd::RunOnce([this] {
       fieldCentric = !fieldCentric;

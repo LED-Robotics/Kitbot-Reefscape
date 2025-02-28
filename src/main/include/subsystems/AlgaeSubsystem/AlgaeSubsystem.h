@@ -9,11 +9,13 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
+#include "rev/SparkFlex.h"
 
 #include "Constants.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
+using namespace rev;
 
 class AlgaeSubsystem : public frc2::SubsystemBase {
  public:
@@ -178,10 +180,8 @@ class AlgaeSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  hardware::TalonFX wristMotor;
-  hardware::TalonFX intakeMotor;
-
-  hardware::CANcoder wristEncoder;
+  spark::SparkFlex wristMotor;
+  spark::SparkFlex intakeMotor;
 
   controls::PositionVoltage wristPosition{0_tr};
 };

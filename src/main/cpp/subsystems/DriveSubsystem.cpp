@@ -20,10 +20,10 @@ using namespace pathplanner;
 
 DriveSubsystem::DriveSubsystem(int *targetRef)
       //Wheel motors
-    : backLeft{kBackLeftPort, "canCan"},
-      frontLeft{kFrontLeftPort, "canCan"},
-      backRight{kBackRightPort, "canCan"},
-      frontRight{kFrontRightPort, "canCan"},
+    : backLeft{kBackLeftPort},
+      frontLeft{kFrontLeftPort},
+      backRight{kBackRightPort},
+      frontRight{kFrontRightPort},
 
       //Degree of wheel motors
       backLeftTheta{kBackLeftThetaPort, SparkLowLevel::MotorType::kBrushed},
@@ -62,7 +62,7 @@ DriveSubsystem::DriveSubsystem(int *targetRef)
         SmartDashboard::PutNumber("offP", kPVelTurnOffset);
         SmartDashboard::PutNumber("offD", kPVelDistOffset);
         SmartDashboard::PutNumber("turnP", kTxAdjust);
-
+        
         // Configure the AutoBuilder last
         ConfigAutonController();
       }

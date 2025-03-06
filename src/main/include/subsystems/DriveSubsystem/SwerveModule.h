@@ -117,5 +117,5 @@ class SwerveModule {
         // Only for DutyCycle
         double turnEncoderOffset = 0.0;
         // frc2::PIDController neoController{0.005, 0.0, 0.0}; off floor
-        frc::PIDController neoController{0.007, 0.0, 0.0};
+        frc::PIDController neoController{0.005, 0.0, 0.0};
 };

@@ -34,14 +34,14 @@ namespace DriveConstants {
     
     constexpr double kBLeftMagPos = 0.216513005412825;
     constexpr double kFLeftMagPos = 0.258272881456822;
-    constexpr double kBRightMagPos = 0.204911880122797;
-    constexpr double kFRightMagPos = 0.990530224763256;
+    constexpr double kBRightMagPos = 0.026098625652466;
+    constexpr double kFRightMagPos = 0.50;
     
     // info for odometry
     constexpr int kEncoderResolution = 4096;
     constexpr auto kDriveBaseRadius = 0.319786_m;
-    constexpr double kWheelRadius = .0508;
-    constexpr double kDriveRatio = 1 / 4.125;
+    constexpr double kWheelRadius = 0.0381;
+    constexpr double kDriveRatio = 1 / 4.13;
     constexpr double kTurnRatio = 1 / 10.29;
     constexpr double kDriveDistancePerRev = (2 * std::numbers::pi * kWheelRadius) * kDriveRatio;
     // constexpr double kDriveEncoderDistancePerPulse = (2 * std::numbers::pi * kWheelRadius / (double)kEncoderResolution) * kDriveRatio;
@@ -52,7 +52,7 @@ namespace DriveConstants {
     constexpr int kArbitrary = 0;
 
     // TalonFX config
-    constexpr double kDriveP = 0.2402345985174179;
+    constexpr double kDriveP = 0.12;
     constexpr double kDriveV = 0.1345313787460327;
     constexpr units::time::second_t kDriveRamp = 0.0_s;
     constexpr units::current::ampere_t kDriveCurrentLimit = 30.0_A;

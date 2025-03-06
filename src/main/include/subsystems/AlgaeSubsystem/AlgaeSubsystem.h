@@ -75,7 +75,7 @@ class AlgaeSubsystem : public frc2::SubsystemBase {
   /**
    * Initially configure onboard TalonFX settings for motors.
    */
-  void ConfigIntake();
+  // void ConfigIntake();
 
   /**
   * Gets if a piece of coral is indexed.

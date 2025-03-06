@@ -19,7 +19,7 @@ AlgaeSubsystem::AlgaeSubsystem()
       /*wristMotor.SetPosition(0.0_tr);*/
       SmartDashboard::PutNumber("Algae Angle", 80.0);
 
-      ConfigIntake();
+      // ConfigIntake();
       ConfigWrist();
 
       /*SetTargetAngle(kWristStartAngle);*/

@@ -44,7 +44,7 @@ DriveSubsystem::DriveSubsystem(int *targetRef)
       s_frontRight{&frontRight, &frontRightTheta, &frEncoder, kFRightMagPos},
 
       //Gryo
-      gyro{0, "canCan"},
+      gyro{0},
 
       //Odometry
       odometry{kDriveKinematics, {GetRotation()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
@@ -69,15 +69,15 @@ DriveSubsystem::DriveSubsystem(int *targetRef)
 
 void DriveSubsystem::Periodic() {
   // Encoder Vals
-  // SmartDashboard::PutNumber("BL Abs", blEncoder.Get());
-  // SmartDashboard::PutNumber("FL Abs", flEncoder.Get());
-  // SmartDashboard::PutNumber("BR Abs", brEncoder.Get());
-  // SmartDashboard::PutNumber("FR Abs", frEncoder.Get());
+  SmartDashboard::PutNumber("BL Abs", blEncoder.Get());
+  SmartDashboard::PutNumber("FL Abs", flEncoder.Get());
+  SmartDashboard::PutNumber("BR Abs", brEncoder.Get());
+  SmartDashboard::PutNumber("FR Abs", frEncoder.Get());
 
-  // SmartDashboard::PutNumber("BL Pos", (double)s_backLeft.GetTurnEncoderAngle());
-  // SmartDashboard::PutNumber("FL Pos", (double)s_frontLeft.GetTurnEncoderAngle());
-  // SmartDashboard::PutNumber("BR Pos", (double)s_backRight.GetTurnEncoderAngle());
-  // SmartDashboard::PutNumber("FR Pos", (double)s_frontRight.GetTurnEncoderAngle());
+  SmartDashboard::PutNumber("BL Pos", (double)s_backLeft.GetTurnEncoderAngle());
+  SmartDashboard::PutNumber("FL Pos", (double)s_frontLeft.GetTurnEncoderAngle());
+  SmartDashboard::PutNumber("BR Pos", (double)s_backRight.GetTurnEncoderAngle());
+  SmartDashboard::PutNumber("FR Pos", (double)s_frontRight.GetTurnEncoderAngle());
 
   // SetThetaToHold({units::angle::degree_t{SmartDashboard::GetNumber("Theta Target", 0.0)}});
    s_frontLeft.RunPID();

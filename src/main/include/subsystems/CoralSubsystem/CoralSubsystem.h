@@ -15,12 +15,13 @@
 #include "Constants.h"
 
 using namespace frc;
-using namespace ctre::phoenix6;
+// using namespace ctre::phoenix6;
 using namespace rev::spark;
+using namespace CoralConstants;
 
-class AlgaeSubsystem : public frc2::SubsystemBase {
+class CoralSubsystem : public frc2::SubsystemBase {
  public:
-  AlgaeSubsystem();
+  CoralSubsystem();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -80,7 +81,7 @@ class AlgaeSubsystem : public frc2::SubsystemBase {
   /**
   * Gets if a piece of coral is indexed.
   */
-  bool IsAlgaeIndexed();
+  bool IsCoralIndexed();
   
             /* WRIST FUNCTIONS */
 
@@ -169,13 +170,13 @@ class AlgaeSubsystem : public frc2::SubsystemBase {
     
  private:
   // While the state is kOn the intake will run at the current power setting
-  int intakeState = AlgaeConstants::IntakeStates::kIntakePowerMode;
-  double intakePower = AlgaeConstants::kIntakeDefaultPower;
+  int intakeState = CoralConstants::IntakeStates::kIntakePowerMode;
+  double intakePower = CoralConstants::kIntakeDefaultPower;
   
   // While the state is kOn the wrist will run on the angle mode.
-  int wristState = AlgaeConstants::WristStates::kWristAngleMode;
-  double wristPower = AlgaeConstants::kWristDefaultPower;
-  units::angle::degree_t wristAngle{110_deg};
+  int wristState = CoralConstants::WristStates::kWristAngleMode;
+  double wristPower = CoralConstants::kWristDefaultPower;
+  units::angle::degree_t wristAngle{kWristStartAngle};
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

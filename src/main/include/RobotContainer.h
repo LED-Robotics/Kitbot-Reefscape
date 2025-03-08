@@ -24,6 +24,8 @@
 
 #include "GlobalConstants.h"
 
+#include "subsystems/CoralSubsystem/CoralSubsystem.h"
+#include "subsystems/AlgaeSubsystem/AlgaeSubsystem.h"
 #include "subsystems/DriveSubsystem/DriveSubsystem.h"
 #include "subsystems/CascadeSubsystem/CascadeSubsystem.h"
 #include "subsystems/LEDSubsystem/LEDSubsystem.h"
@@ -100,15 +102,15 @@ class RobotContainer {
   int TrackingTarget = GlobalConstants::kCoralMode;
   
   // The robot's subsystems
-  // AlgaeSubsystem algae{};
+  AlgaeSubsystem algae{};
 
   DriveSubsystem m_drive{&TrackingTarget};
   
   // CascadeSubsystem cascade{};
 
   // ClimbSubsystem climb{};
-
-  // CoralSubsystem coral{};
+  
+  CoralSubsystem coral{};
 
   // FunnelSubsystem funnel{};
 

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/AlgaeSubsystem/AlgaeSubsystem.h"
+#include "subsystems/CoralSubsystem/CoralSubsystem.h"
 
 #include <frc/geometry/Rotation2d.h>
 #include <iostream>
@@ -10,14 +10,14 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 
-using namespace AlgaeConstants;
+using namespace CoralConstants;
 using namespace frc;
 
-AlgaeSubsystem::AlgaeSubsystem()
+CoralSubsystem::CoralSubsystem()
   : wristMotor{kWristPort, SparkLowLevel::MotorType::kBrushless},
     intakeMotor{kIntakePort, SparkLowLevel::MotorType::kBrushless} {
       /*wristMotor.SetPosition(0.0_tr);*/
-      // SmartDashboard::PutNumber("Algae Angle", 80.0);
+      SmartDashboard::PutNumber("Coral Angle", kWristStartAngle.value());
 
       // ConfigIntake();
       ConfigWrist();
@@ -26,11 +26,11 @@ AlgaeSubsystem::AlgaeSubsystem()
 
 }
 
-void AlgaeSubsystem::Periodic() {
+void CoralSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // Wrist Control
-  // SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("Algae Angle", GetAngle().value())});
-  SmartDashboard::PutNumber("Algae Actual", GetAngle().value());
+  // SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("Coral Angle", GetAngle().value())});
+  SmartDashboard::PutNumber("Coral Actual", GetAngle().value());
   if(wristState == WristStates::kWristOff) {
     wristMotor.Set(0.0);
   } else if(wristState == WristStates::kWristPowerMode) {
@@ -39,13 +39,13 @@ void AlgaeSubsystem::Periodic() {
     // feed forwards should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
 
 
-    SmartDashboard::PutNumber("algaeWristTr", wristMotor.GetEncoder().GetPosition());  // print to Shuffleboard
-    SmartDashboard::PutNumber("algaeAngle", GetAngle().value());  // print to Shuffleboard
+    SmartDashboard::PutNumber("coralWristTr", wristMotor.GetEncoder().GetPosition());  // print to Shuffleboard
+    SmartDashboard::PutNumber("coralAngle", GetAngle().value());  // print to Shuffleboard
     double feedForward = fabs(sin(wristAngle.value())) * kMaxFeedForward;
-    SmartDashboard::PutNumber("Angle Target", wristAngle.value());
-    units::angle::turn_t posTarget{(wristAngle - kWristStartAngle) / kTurnsPerDegree};
-    SmartDashboard::PutNumber("wrTurnTarget", posTarget.value());
-    // wristMotor.GetClosedLoopController().SetReference(posTarget.value(), SparkBase::ControlType::kPosition);
+    SmartDashboard::PutNumber("Coral Target", wristAngle.value());
+    units::angle::turn_t posTarget{(wristAngle - kWristStartAngle).value() * kTurnsPerDegree};
+    SmartDashboard::PutNumber("coralTrTarget", posTarget.value());
+    wristMotor.GetClosedLoopController().SetReference(posTarget.value(), SparkBase::ControlType::kPosition);
 
     //Intake Control
     // if(intakeState == IntakeStates::kIntakeOff) {
@@ -56,27 +56,27 @@ void AlgaeSubsystem::Periodic() {
   }
 }
 
-void AlgaeSubsystem::IntakeOn() {
+void CoralSubsystem::IntakeOn() {
   intakeState = IntakeStates::kIntakePowerMode;
 }
 
-void AlgaeSubsystem::IntakeOff() {
+void CoralSubsystem::IntakeOff() {
   intakeState = IntakeStates::kIntakeOff;
 }
 
-void AlgaeSubsystem::SetIntakePower(double newPower) {
+void CoralSubsystem::SetIntakePower(double newPower) {
   intakePower = newPower;
 }
 
-double AlgaeSubsystem::GetIntakePower() {
+double CoralSubsystem::GetIntakePower() {
   return intakePower;
 }
 
-void AlgaeSubsystem::SetIntakeState(int newState) {
+void CoralSubsystem::SetIntakeState(int newState) {
   intakeState = newState;
 }
 
-int AlgaeSubsystem::GetIntakeState() {
+int CoralSubsystem::GetIntakeState() {
   return intakeState;
 }
 
@@ -99,57 +99,57 @@ int AlgaeSubsystem::GetIntakeState() {
 //   intakeMotor.GetConfigurator().Apply(algaeIntakeConfig);
 // }
 
-bool AlgaeSubsystem::IsAlgaeIndexed() {
+bool CoralSubsystem::IsCoralIndexed() {
   // Add when limit switch is added
   return false;
 }
 
-void AlgaeSubsystem::WristOn() {
+void CoralSubsystem::WristOn() {
   wristState = WristStates::kWristAngleMode;
 }
 
-void AlgaeSubsystem::WristOff() {
+void CoralSubsystem::WristOff() {
   wristState = WristStates::kWristOff;
 }
 
-void AlgaeSubsystem::SetWristPower(double newPower) {
+void CoralSubsystem::SetWristPower(double newPower) {
   wristPower = newPower;
 }
 
-double AlgaeSubsystem::GetWristPower() {
+double CoralSubsystem::GetWristPower() {
   return wristPower;
 }
 
-void AlgaeSubsystem::SetTargetAngle(units::angle::degree_t newAngle) {
+void CoralSubsystem::SetTargetAngle(units::angle::degree_t newAngle) {
   wristAngle = newAngle;
   if(wristAngle < kWristDegreeMin) wristAngle = kWristDegreeMin;
   if(wristAngle > kWristDegreeMax) wristAngle = kWristDegreeMax;
 }
 
-units::angle::degree_t AlgaeSubsystem::GetAngle() {
+units::angle::degree_t CoralSubsystem::GetAngle() {
   return units::angle::degree_t{(GetWristPosition() / kTurnsPerDegree)} + kWristStartAngle;
 }
 
-double AlgaeSubsystem::GetWristPosition() {
+double CoralSubsystem::GetWristPosition() {
   return wristMotor.GetEncoder().GetPosition();
 }
 
-bool AlgaeSubsystem::IsAtTarget() {
+bool CoralSubsystem::IsAtTarget() {
   auto target = wristAngle;
   auto angle = GetAngle();
   bool atTarget = angle > target - (kWristAngleDeadzone / 2) && angle < target + (kWristAngleDeadzone / 2);
   return atTarget;
 }
 
-void AlgaeSubsystem::SetWristState(int newState) {
+void CoralSubsystem::SetWristState(int newState) {
   wristState = newState;
 }
 
-int AlgaeSubsystem::GetWristState() {
+int CoralSubsystem::GetWristState() {
   return wristState;
 }
 
-frc2::CommandPtr AlgaeSubsystem::GetMoveCommand(units::angle::degree_t target) {
+frc2::CommandPtr CoralSubsystem::GetMoveCommand(units::angle::degree_t target) {
   /*return frc2::cmd::Sequence(*/
   /*    frc2::cmd::RunOnce([this, target]() {*/
   /*      SetTargetAngle(target);*/
@@ -161,18 +161,18 @@ frc2::CommandPtr AlgaeSubsystem::GetMoveCommand(units::angle::degree_t target) {
         SetTargetAngle(target);
       }, {this});
 }
-void AlgaeSubsystem::SetWristBrakeMode(bool state) {
+void CoralSubsystem::SetWristBrakeMode(bool state) {
 
 }
 
-void AlgaeSubsystem::ConfigWrist() {
+void CoralSubsystem::ConfigWrist() {
   wristConfig
     .SetIdleMode(SparkBaseConfig::IdleMode::kBrake)
     .SmartCurrentLimit(40.0)
     .Inverted(false)
   .closedLoop
     .SetFeedbackSensor(ClosedLoopConfig::FeedbackSensor::kPrimaryEncoder)
-    .P(20.0)
+    .P(0.1)
     .I(0.0)
     .D(0.0)
     .OutputRange(-1.0, 1.0);

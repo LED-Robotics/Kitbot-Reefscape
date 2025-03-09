@@ -330,6 +330,7 @@ void DriveSubsystem::ConfigDriveMotors() {
   backLeft.GetConfigurator().Apply(driveConfig);
   frontLeft.GetConfigurator().Apply(driveConfig);
   backRight.GetConfigurator().Apply(driveConfig);
+  // driveConfig.MotorOutput.Inverted = signals::InvertedValue::CounterClockwise_Positive;
   frontRight.GetConfigurator().Apply(driveConfig);
 }
 

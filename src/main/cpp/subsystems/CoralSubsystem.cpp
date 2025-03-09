@@ -47,12 +47,12 @@ void CoralSubsystem::Periodic() {
     SmartDashboard::PutNumber("coralTrTarget", posTarget.value());
     wristMotor.GetClosedLoopController().SetReference(posTarget.value(), SparkBase::ControlType::kPosition);
 
-    //Intake Control
-    // if(intakeState == IntakeStates::kIntakeOff) {
-    //   intakeMotor.Set(0.0);
-    // } else {
-    //   intakeMotor.Set(intakePower);
-    // }
+    // Intake Control
+    if(intakeState == IntakeStates::kIntakeOff) {
+      intakeMotor.Set(0.0);
+    } else {
+      intakeMotor.Set(intakePower);
+    }
   }
 }
 
@@ -169,7 +169,7 @@ void CoralSubsystem::ConfigWrist() {
   wristConfig
     .SetIdleMode(SparkBaseConfig::IdleMode::kBrake)
     .SmartCurrentLimit(40.0)
-    .Inverted(false)
+    .Inverted(true)
   .closedLoop
     .SetFeedbackSensor(ClosedLoopConfig::FeedbackSensor::kPrimaryEncoder)
     .P(0.1)

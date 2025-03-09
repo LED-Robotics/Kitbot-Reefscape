@@ -176,7 +176,7 @@ class CoralSubsystem : public frc2::SubsystemBase {
   // While the state is kOn the wrist will run on the angle mode.
   int wristState = CoralConstants::WristStates::kWristAngleMode;
   double wristPower = CoralConstants::kWristDefaultPower;
-  units::angle::degree_t wristAngle{kWristStartAngle + 10_deg};
+  units::angle::degree_t wristAngle{kWristStartAngle + 15_deg};
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

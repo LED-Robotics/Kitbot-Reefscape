@@ -106,7 +106,7 @@ class RobotContainer {
 
   DriveSubsystem m_drive{&TrackingTarget};
   
-  // CascadeSubsystem cascade{};
+  CascadeSubsystem cascade{};
 
   // ClimbSubsystem climb{};
   

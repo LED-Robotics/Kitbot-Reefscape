@@ -13,8 +13,7 @@ using namespace CascadeConstants;
 using namespace frc;
 
 CascadeSubsystem::CascadeSubsystem()
-  : left{kLeftMotorPort},
-  right{kRightMotorPort}
+  : motor{kMotorPort, rev::spark::SparkLowLevel::MotorType::kBrushless}
   // encoder{kEncoderPort} 
   {
     SmartDashboard::PutNumber("Cascade Position", position.value());
@@ -26,25 +25,21 @@ CascadeSubsystem::CascadeSubsystem()
 
 void CascadeSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  /*SetTargetPosition(units::length::meter_t{SmartDashboard::GetNumber("Cascade Position", position.value())});*/
+  SetTargetPosition(units::length::meter_t{SmartDashboard::GetNumber("Cascade Position", position.value())});
   /*SetPower(SmartDashboard::GetNumber("Cascade Power", power));*/
   /*SmartDashboard::PutNumber("Cascade Voltage", left.GetMotorVoltage().GetValueAsDouble());*/
-  SmartDashboard::PutNumber("Left Actual Cascade", GetLeftPosition().value());
-  SmartDashboard::PutNumber("Right Actual Cascade", GetRightPosition().value());
+  SmartDashboard::PutNumber("Actual Cascade", GetPosition().value());
   if(state == kOff) {
-    left.Set(0.0);
-    right.Set(0.0);
+    motor.Set(0.0);
   } else if(state == CascadeStates::kPowerMode) {
-    left.Set(power);
-    right.Set(power);
+    motor.Set(power);
   } else if(state == CascadeStates::kPositionMode) {
 
-  SmartDashboard::PutNumber("leftCascadeTr", left.GetPosition().GetValue().value());
-  SmartDashboard::PutNumber("rightCascadeTr", right.GetPosition().GetValue().value());
-  SmartDashboard::PutNumber("cascadePosition", ((GetLeftPosition().value()) + (GetRightPosition().value())) / 2);  // print to Shuffleboard
+  SmartDashboard::PutNumber("cascadeTr", motor.GetEncoder().GetPosition());
     
-    SmartDashboard::PutNumber("Position Target", position.value());
-    units::angle::turn_t posTarget{((position - kStartPosition) / kStageMultiplier).value() * kTurnsPerMeter};
+    units::angle::turn_t posTarget{(position - kStartPosition).value() * kTurnsPerMeter};
+    SmartDashboard::PutNumber("PositionTr", posTarget.value());
+    motor.GetClosedLoopController().SetReference(posTarget.value(), SparkBase::ControlType::kPosition);
     // left.SetControl(positionController
     //   .WithPosition(units::angle::turn_t{posTarget})
     //   .WithEnableFOC(true));
@@ -82,20 +77,8 @@ int CascadeSubsystem::GetState() {
   return state;
 }
 
-units::length::meter_t CascadeSubsystem::GetLeftPosition() {
-  auto base = units::length::meter_t{left.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
-  return base * kStageMultiplier + kStartPosition;
-}
-
-units::length::meter_t CascadeSubsystem::GetRightPosition() {
-  auto base = units::length::meter_t{right.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
-  return base * kStageMultiplier + kStartPosition;
-}
-
 units::length::meter_t CascadeSubsystem::GetPosition() {
-  auto left = GetLeftPosition();
-  auto right = GetRightPosition();
-  return (left + right) / 2;
+  return units::length::meter_t{motor.GetEncoder().GetPosition() / kTurnsPerMeter} + kStartPosition;
 }
 
 void CascadeSubsystem::SetTargetPosition(units::length::meter_t newPosition) {
@@ -106,11 +89,8 @@ void CascadeSubsystem::SetTargetPosition(units::length::meter_t newPosition) {
 
 bool CascadeSubsystem::IsAtTarget() {
   auto target = position;
-  auto leftPos = GetLeftPosition();
-  auto rightPos = GetRightPosition();
-  bool leftAtTarget = leftPos > target - (kPositionDeadzone / 2) && leftPos < target + (kPositionDeadzone / 2);
-  bool rightAtTarget = rightPos > target - (kPositionDeadzone / 2) && rightPos < target + (kPositionDeadzone / 2);
-  return leftAtTarget && rightAtTarget;
+  auto pos = GetPosition();
+  return pos > target - (kPositionDeadzone / 2) && pos < target + (kPositionDeadzone / 2);
 }
 
 void CascadeSubsystem::SetBrakeMode(bool state) {
@@ -120,47 +100,24 @@ void CascadeSubsystem::SetBrakeMode(bool state) {
   configs::MotorOutputConfigs updated;
   updated.WithNeutralMode(mode);
 
-  left.GetConfigurator().Apply(updated, 50_ms);
-  right.GetConfigurator().Apply(updated, 50_ms);
+  // motor.GetConfigurator().Apply(updated, 50_ms);
+  // right.GetConfigurator().Apply(updated, 50_ms);
 }
 
 void CascadeSubsystem::ConfigMotors() {
-  configs::TalonFXConfiguration cascadeConfig{};
-  
-  cascadeConfig.Slot0.kP = kP;
-  cascadeConfig.Slot0.kD = kD;
-  cascadeConfig.Slot0.kG = kG;
-  // cascadeConfig.Slot0.kS = 0.28;
-  // cascadeConfig.Slot0.kV = 8.5;
-  // cascadeConfig.Slot0.kA = 3.0;
-  // cascadeConfig.Slot0.kP = 8.0;
+  SparkMaxConfig config{};
+  config.SetIdleMode(SparkBaseConfig::IdleMode::kBrake);
+  config.SmartCurrentLimit(40.0);
+  config.Inverted(false);
+  ClosedLoopConfig closedLoop;
+  closedLoop.SetFeedbackSensor(ClosedLoopConfig::FeedbackSensor::kPrimaryEncoder);
+  closedLoop.P(0.05);
+  closedLoop.I(0.0);
+  closedLoop.D(0.0);
+  closedLoop.OutputRange(-1.0, 1.0);
+  config.Apply(closedLoop);
 
-  // cascadeConfig.MotionMagic.MotionMagicCruiseVelocity = 6.0;
-  // cascadeConfig.MotionMagic.MotionMagicAcceleration = 2.0;
-  // cascadeConfig.MotionMagic.MotionMagicJerk = 200.0;
-  
-  cascadeConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
-  cascadeConfig.Feedback.RotorToSensorRatio = kRotorToGearbox;
-  cascadeConfig.MotorOutput.PeakReverseDutyCycle = -1.0;
-  cascadeConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
-  cascadeConfig.Feedback.SensorToMechanismRatio = 16.0;
-  cascadeConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = kRampSeconds;
-  cascadeConfig.Audio.AllowMusicDurDisable = true;
-  
-  cascadeConfig.MotorOutput.Inverted = true;
-  // cascadeConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
-  
-  left.GetConfigurator().Apply(cascadeConfig);
-  cascadeConfig.MotorOutput.Inverted = false;
-  // cascadeConfig.DifferentialSensors.DifferentialSensorSource = signals::DifferentialSensorSourceValue::RemoteTalonFX_Diff;
-  // cascadeConfig.DifferentialSensors.DifferentialTalonFXSensorID = kLeftMotorPort;
-  right.GetConfigurator().Apply(cascadeConfig);
-
-  // configs::CANcoderConfiguration encoderConfig{};
-  // encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
-  // encoderConfig.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
-  // encoderConfig.MagnetSensor.MagnetOffset = kEncoderOffset;
-  // encoder.GetConfigurator().Apply(encoderConfig);
+  motor.Configure(config, SparkBase::ResetMode::kResetSafeParameters, SparkBase::PersistMode::kPersistParameters);
 }
 
 frc2::CommandPtr CascadeSubsystem::GetMoveCommand(units::length::meter_t target) {

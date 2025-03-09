@@ -9,10 +9,13 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
+#include "rev/SparkMax.h"
+#include "rev/config/SparkMaxConfig.h"
 #include "Constants.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
+using namespace rev::spark;
 
 class CascadeSubsystem : public frc2::SubsystemBase {
  public:
@@ -51,16 +54,6 @@ class CascadeSubsystem : public frc2::SubsystemBase {
    * Sets the current state of the Cascade.
    */
   void SetState(int newState);
-  
-  /**
-   * Returns the current position of the left Cascade's KrakenX60.
-   */
-  units::length::meter_t GetLeftPosition();
-
-  /**
-   * Returns the current position of the right Cascade's KrakenX60.
-   */
-  units::length::meter_t GetRightPosition();
 
   /**
    * Returns the current estimated angle of the Cascade Subsystem.
@@ -104,8 +97,7 @@ class CascadeSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  hardware::TalonFX left;
-  hardware::TalonFX right;
+  SparkMax motor;
 
   // hardware::CANcoder encoder;
 

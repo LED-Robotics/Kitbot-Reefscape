@@ -17,7 +17,7 @@ CoralSubsystem::CoralSubsystem()
   : wristMotor{kWristPort, SparkLowLevel::MotorType::kBrushless},
     intakeMotor{kIntakePort, SparkLowLevel::MotorType::kBrushless} {
       /*wristMotor.SetPosition(0.0_tr);*/
-      SmartDashboard::PutNumber("Coral Angle", kWristStartAngle.value());
+      SmartDashboard::PutNumber("Coral Angle", wristAngle.value());
 
       // ConfigIntake();
       ConfigWrist();
@@ -29,7 +29,7 @@ CoralSubsystem::CoralSubsystem()
 void CoralSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // Wrist Control
-  // SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("Coral Angle", GetAngle().value())});
+  SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("Coral Angle", GetAngle().value())});
   SmartDashboard::PutNumber("Coral Actual", GetAngle().value());
   if(wristState == WristStates::kWristOff) {
     wristMotor.Set(0.0);
@@ -124,6 +124,7 @@ void CoralSubsystem::SetTargetAngle(units::angle::degree_t newAngle) {
   wristAngle = newAngle;
   if(wristAngle < kWristDegreeMin) wristAngle = kWristDegreeMin;
   if(wristAngle > kWristDegreeMax) wristAngle = kWristDegreeMax;
+  SmartDashboard::PutNumber("Coral Angle", wristAngle.value());
 }
 
 units::angle::degree_t CoralSubsystem::GetAngle() {

@@ -52,7 +52,7 @@ namespace DriveConstants {
     constexpr int kArbitrary = 0;
 
     // TalonFX config
-    constexpr double kDriveP = 0.12;
+    constexpr double kDriveP = 0.08;
     constexpr double kDriveV = 0.1345313787460327;
     constexpr units::time::second_t kDriveRamp = 0.0_s;
     constexpr units::current::ampere_t kDriveCurrentLimit = 30.0_A;
@@ -67,7 +67,7 @@ namespace DriveConstants {
     constexpr double kDriveCurveExtent = 0.6;
     constexpr auto kDriveAccelerationLimit = 9.0_mps_sq;
     constexpr auto kDriveDecelerationLimit = 25.0_mps_sq;
-    constexpr auto kDriveTranslationLimit = 7.7_mps;
+    constexpr auto kDriveTranslationLimit = 3.3_mps;
     constexpr double kTxAdjust = 0.5;
     constexpr double kAlignP = 0.5;
     constexpr double kPVelTurnOffset = -2.0;

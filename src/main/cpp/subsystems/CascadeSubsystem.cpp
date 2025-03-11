@@ -85,6 +85,7 @@ void CascadeSubsystem::SetTargetPosition(units::length::meter_t newPosition) {
   position = newPosition;
   if(position < kCascadeMeterMin) position = kCascadeMeterMin;
   if(position > kCascadeMeterMax) position = kCascadeMeterMax;
+  SmartDashboard::PutNumber("Cascade Position", position.value());
 }
 
 bool CascadeSubsystem::IsAtTarget() {

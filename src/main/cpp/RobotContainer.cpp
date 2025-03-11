@@ -36,13 +36,6 @@ frc2::Command* RobotContainer::GetEmptyCommand() {
            }, {});
 }
 
-/* frc2::CommandPtr RobotContainer::SetMultijoint(units::length::meter_t cascadeHeight, units::angle::degree_t algaeAngle) {
-  return frc2::cmd::Parallel(
-    cascade.GetMoveCommand(cascadeHeight),
-    algae.GetMoveCommand(algaeAngle)
-  );
-} */
-
 RobotContainer::RobotContainer() {
   // Autonomous selector configuration
   autonChooser.SetDefaultOption("None", "None");
@@ -124,9 +117,15 @@ RobotContainer::RobotContainer() {
 
   controller.Y().OnTrue(std::move(toggleFieldCentric));
 
-  controller.A().OnTrue(coral.GetMoveCommand(45_deg));  
-  controller.B().OnTrue(coral.GetMoveCommand(90_deg));  
-  controller.X().OnTrue(coral.GetMoveCommand(105_deg));  
+  controller.Back().OnTrue(SetAllKinematics(CoralLoad));
+  controller.Start().OnTrue(SetAllKinematics(startingPose));
+  mainDpadDown.OnTrue(SetAllKinematics(L1Pose));  
+  mainDpadRight.OnTrue(SetAllKinematics(L2Pose));  
+  mainDpadLeft.OnTrue(SetAllKinematics(L3Pose));  
+  mainDpadUp.OnTrue(SetAllKinematics(L4Pose));
+
+  controller.A().OnTrue(SetAllKinematics(L2AlgaeDescore));  
+  controller.B().OnTrue(SetAllKinematics(L3AlgaeDescore));
 
 
   m_drive.SetDefaultCommand(frc2::cmd::Run(
@@ -170,7 +169,7 @@ RobotContainer::RobotContainer() {
   algae.SetDefaultCommand(frc2::cmd::Run(
     [this] {
       if(TrackingTarget == GlobalConstants::kAlgaeMode || TrackingTarget == GlobalConstants::kArbitrary) {
-        double power = controller.GetLeftTriggerAxis() - controller.GetRightTriggerAxis();
+        double power = controller.GetLeftTriggerAxis() - (controller.GetRightTriggerAxis()/2);
         if(fabs(power) < 0.1) power = 0.0;
         algae.SetIntakePower(power);
       }
@@ -183,7 +182,7 @@ RobotContainer::RobotContainer() {
   coral.SetDefaultCommand(frc2::cmd::Run(
     [this] {
       if(TrackingTarget == GlobalConstants::kCoralMode || TrackingTarget == GlobalConstants::kArbitrary) {
-        double power = controller.GetLeftTriggerAxis() - controller.GetRightTriggerAxis();
+        double power = (controller.GetLeftTriggerAxis()/2.5) - controller.GetRightTriggerAxis();
         if(fabs(power) < 0.1) power = 0.0;
         coral.SetIntakePower(power);
       }
@@ -213,15 +212,20 @@ RobotContainer::RobotContainer() {
 
 }
 
-/* frc2::CommandPtr RobotContainer::SetAllKinematics(RobotContainer::KinematicsPoses kinInfoRef) {
+frc2::CommandPtr RobotContainer::SetAllKinematics(RobotContainer::KinematicsPose pose) {
   return frc2::cmd::Sequence(
     frc2::cmd::RunOnce(
-      [&]() {
-        cascade.SetTargetPosition(kinInfoRef.cascadePose);
+      [this, pose]() {
+        cascade.SetTargetPosition(pose.cascadePose);
         // Add other subsystems
-      }, {&cascade})
+      }, {&cascade}),
+    frc2::cmd::RunOnce(
+      [this, pose]() {
+        coral.SetTargetAngle(pose.coralAngle);
+        // Add other subsystems
+      }, {&coral})
   );
-} */
+}
 
 void RobotContainer::SetDriveBrakes(bool state) {
   m_drive.SetBrakeMode(state);

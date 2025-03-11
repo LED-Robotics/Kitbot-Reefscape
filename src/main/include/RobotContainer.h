@@ -52,15 +52,16 @@ class RobotContainer {
  public:
   RobotContainer();
 
-  static struct KinematicsPoses {
+  struct KinematicsPose {
     units::length::meter_t cascadePose;
+    units::angle::degree_t coralAngle;
     //Angle of wrist
     //More will be added
-  } kinematicsInfo;
+  };
   /**
    * Return the command pointer that sets all subsystem kinematics.
    */
-  frc2::CommandPtr SetAllKinematics(KinematicsPoses kinInfoRef);
+  frc2::CommandPtr SetAllKinematics(KinematicsPose pose);
 
   /**
    * Return the command pointer to the autonomous command. 
@@ -117,6 +118,43 @@ class RobotContainer {
   // FloorSubsystem floor{};
 
   // LEDSubsystem led{};
+
+  // Kinematics Poses //
+  KinematicsPose startingPose{
+    CascadeConstants::kStartPosition,
+    CoralConstants::kWristStartAngle + 15_deg
+  };
+
+  KinematicsPose L2Pose {
+    0.92_m,
+    290.09_deg
+  };
+
+  KinematicsPose L3Pose {
+    1.25_m,
+    285.09_deg
+  };
+  KinematicsPose L4Pose {
+    1.79_m,
+    152.71_deg
+  };
+  KinematicsPose L1Pose {
+    1.0_m,
+    46.03_deg
+  };
+  KinematicsPose CoralLoad {
+    0.92_m,
+    107.03_deg
+  };
+  KinematicsPose L2AlgaeDescore {
+    0.92_m,
+    250_deg
+  };
+  KinematicsPose L3AlgaeDescore {
+    1.1_m,
+    250_deg
+  };
+  // Kinematics Poses //
 
   // used for AprilTag odom updates
   units::degree_t startOffset{180.0};
@@ -180,7 +218,6 @@ class RobotContainer {
     }, {})
   };
 
-  frc2::Trigger mainBack{controller.Back()};
   frc2::Trigger mainDpadUp{controller.POV(0)};
   frc2::Trigger mainDpadDown{controller.POV(180)};
   frc2::Trigger mainDpadLeft{controller.POV(270)};

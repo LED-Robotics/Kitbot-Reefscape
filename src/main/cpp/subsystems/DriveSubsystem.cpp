@@ -111,6 +111,8 @@ void DriveSubsystem::Drive(frc::ChassisSpeeds speeds,
   units::meters_per_second_t x = speeds.vx;
   units::meters_per_second_t y = speeds.vy;
   units::angular_velocity::radians_per_second_t rot = speeds.omega;
+  SmartDashboard::PutNumber("X Drive Speed", x.value());
+  SmartDashboard::PutNumber("X Drive Speed", y.value());
   if(omegaOverride) {
     double angle = GetPose().Rotation().Degrees().value();
     double target = SwerveModule::PlaceInAppropriate0To360Scope(thetaHoldController.GetSetpoint(), angle);

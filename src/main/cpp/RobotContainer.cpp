@@ -152,8 +152,15 @@ RobotContainer::RobotContainer() {
       float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
       // pass filtered inputs to Drive function
       // inputs will be between -1.0 to 1.0, multiply by intended speed range in mps/deg_per_s when passing
-      m_drive.Drive({xSpeed * DriveConstants::kDriveTranslationLimit, ySpeed * DriveConstants::kDriveTranslationLimit, 
-      turn * -270.0_deg_per_s}, true, fieldCentric);
+      double cascadeAdjust = 1.0 - (cascade.GetPosition() - CascadeConstants::kStartPosition).value() / 1.2;
+      if(cascadeAdjust > 1.0) cascadeAdjust = 1.0;
+      if(cascadeAdjust < 0.15) cascadeAdjust = 0.15;
+      m_drive.Drive({
+        xSpeed * DriveConstants::kDriveTranslationLimit * cascadeAdjust, 
+        ySpeed * DriveConstants::kDriveTranslationLimit * cascadeAdjust, 
+        turn * -270.0_deg_per_s}, true, fieldCentric);
+      SmartDashboard::PutData(std::move(&autonChooser));  // send auton selector to Shuffleboard
+
     }, {&m_drive}));
 
 /*   intake.SetDefaultCommand(frc2::cmd::Run(
@@ -162,6 +169,9 @@ RobotContainer::RobotContainer() {
         double power = controller.GetLeftTriggerAxis() - controller.GetRightTriggerAxis();
         if(fabs(power) < 0.1) power = 0.0;
         intake.SetPower(power);
+
+
+
       }
     },
   {&intake})); */

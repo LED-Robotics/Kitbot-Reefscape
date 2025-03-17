@@ -212,3 +212,10 @@ void RobotContainer::EnableTagTracking() {
 void RobotContainer::SetSlew(bool state) {
   m_drive.SetLimiting(state);
 }
+
+frc2::CommandPtr RobotContainer::GetAutonomousCommand(){
+    // This method loads the auto when it is called, however, it is recommended
+    // to first load your paths/autos when code starts, then return the
+    // pre-loaded auto/path
+    return PathPlannerAuto("Example Auto").ToPtr();
+}

@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 5.0,
-    "maxAcceleration": 1.5,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "folder": "left R paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -52.85331330197819
+    "rotation": -52.8533133019782
   },
   "useDefaultConstraints": true
 }

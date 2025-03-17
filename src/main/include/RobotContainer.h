@@ -34,7 +34,7 @@
 #include <frc2/command/WaitCommand.h>
 #include "iostream"
 #include "frc/motorcontrol/Spark.h"
-// #include <pathplanner/lib/commands/PathPlannerAuto.h>
+#include <pathplanner/lib/commands/PathPlannerAuto.h>
 // #include <ctre/Phoenix.h>
 
 // #include <pathplanner/lib/commands/FollowPathHolonomic.h>
@@ -47,6 +47,8 @@
  * scheduler calls).  Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
+using namespace pathplanner;
 
 class RobotContainer {
  public:

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.96331020488115,
+        "y": 2.790100384293224
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.2513036259337813,
+        "y": 2.9536694632405927
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.5972039473684208,
+        "y": 0.6958881578947365
+      },
+      "prevControl": {
+        "x": 1.4574914383561646,
+        "y": 1.027375856164383
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 54.46232220802568
+  },
+  "reversed": false,
+  "folder": "Sus Left Paths B",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 59.4593804556617
+  },
+  "useDefaultConstraints": true
+}

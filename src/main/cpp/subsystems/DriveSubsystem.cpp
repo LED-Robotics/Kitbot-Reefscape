@@ -40,7 +40,7 @@ DriveSubsystem::DriveSubsystem(int *targetRef)
       //Swerve group motors
       s_backLeft{&backLeft, &backLeftTheta, &blEncoder, kBLeftMagPos},
       s_frontLeft{&frontLeft, &frontLeftTheta, &flEncoder, kFLeftMagPos},
-      s_backRight{&backRight, &backRightTheta, &brEncoder, kBRightMagPos},
+      s_backRight{&backRight, &backRightTheta, &brEncoder, kBRightMagPos, true},
       s_frontRight{&frontRight, &frontRightTheta, &frEncoder, kFRightMagPos},
 
       //Gryo
@@ -57,6 +57,11 @@ DriveSubsystem::DriveSubsystem(int *targetRef)
         thetaTarget = targetRef;
 
         ConfigDriveMotors();
+
+        backLeftTheta.SetInverted(false);
+        frontLeftTheta.SetInverted(false);
+        backRightTheta.SetInverted(false);
+        frontRightTheta.SetInverted(false);
 
         SmartDashboard::PutBoolean("Limelight Targeting", targetUsingLimelight);
         SmartDashboard::PutNumber("offP", kPVelTurnOffset);
@@ -197,17 +202,17 @@ void DriveSubsystem::ResetEncoders() {
 
 void DriveSubsystem::SetInverted(bool inverted) {
   //Counter clockwise is inverted, clockwise is not inverted
-  signals::InvertedValue configInvert;
-  configs::MotorOutputConfigs updated;
+  // signals::InvertedValue configInvert;
+  // configs::MotorOutputConfigs updated;
 
-  configInvert = inverted ? signals::InvertedValue::CounterClockwise_Positive : signals::InvertedValue::Clockwise_Positive;
+  // configInvert = inverted ? signals::InvertedValue::CounterClockwise_Positive : signals::InvertedValue::Clockwise_Positive;
   
-  updated.WithInverted(configInvert);
+  // updated.WithInverted(configInvert);
 
-  backLeft.GetConfigurator().Apply(updated, 50_ms);
-  frontLeft.GetConfigurator().Apply(updated, 50_ms);
-  backRight.GetConfigurator().Apply(updated, 50_ms);
-  frontRight.GetConfigurator().Apply(updated, 50_ms);
+  // backLeft.GetConfigurator().Apply(updated, 50_ms);
+  // frontLeft.GetConfigurator().Apply(updated, 50_ms);
+  // backRight.GetConfigurator().Apply(updated, 50_ms);
+  // frontRight.GetConfigurator().Apply(updated, 50_ms);
 }
 
 units::degree_t DriveSubsystem::GetAngle() {
@@ -258,10 +263,10 @@ void DriveSubsystem::SetBrakeMode(bool state) {
   configs::MotorOutputConfigs updated;
   updated.WithNeutralMode(mode);
 
-  backLeft.GetConfigurator().Apply(updated, 50_ms);
-  frontLeft.GetConfigurator().Apply(updated, 50_ms);
-  backRight.GetConfigurator().Apply(updated, 50_ms);
-  frontRight.GetConfigurator().Apply(updated, 50_ms);
+  // backLeft.GetConfigurator().Apply(updated, 50_ms);
+  // frontLeft.GetConfigurator().Apply(updated, 50_ms);
+  // backRight.GetConfigurator().Apply(updated, 50_ms);
+  // frontRight.GetConfigurator().Apply(updated, 50_ms);
 }
 
 double DriveSubsystem::GetPitch() {
@@ -330,10 +335,10 @@ void DriveSubsystem::ConfigDriveMotors() {
   driveConfig.Audio.AllowMusicDurDisable = true;
   
   backLeft.GetConfigurator().Apply(driveConfig);
-  frontLeft.GetConfigurator().Apply(driveConfig);
-  backRight.GetConfigurator().Apply(driveConfig);
-  // driveConfig.MotorOutput.Inverted = signals::InvertedValue::CounterClockwise_Positive;
   frontRight.GetConfigurator().Apply(driveConfig);
+  backRight.GetConfigurator().Apply(driveConfig);
+  driveConfig.MotorOutput.Inverted = signals::InvertedValue::CounterClockwise_Positive;
+  frontLeft.GetConfigurator().Apply(driveConfig);
 }
 
 void DriveSubsystem::ConfigAutonController() {

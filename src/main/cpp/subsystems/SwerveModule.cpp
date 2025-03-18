@@ -16,12 +16,13 @@ SwerveModule::SwerveModule(hardware::TalonFX *drivingMotor,
 }
 
 SwerveModule::SwerveModule(hardware::TalonFX *drivingMotor, SparkMax *turningMotor, 
-        DutyCycleEncoder *thetaEncoder, double thetaEncoderOffset) {
+        DutyCycleEncoder *thetaEncoder, double thetaEncoderOffset, bool flipEncoder) {
     usingFalcon = false;
     driveMotor = drivingMotor;
     neoTurn = turningMotor;
     neoEncoder = thetaEncoder;
     turnEncoderOffset = thetaEncoderOffset;
+    encoderFlipped = flipEncoder;
 }
 
 double SwerveModule::GetFalconTurnPosition() const {
@@ -29,7 +30,13 @@ double SwerveModule::GetFalconTurnPosition() const {
 }
 
 double SwerveModule::GetNeoTurnPosition() const {
-    double angle = turnEncoderOffset - neoEncoder->Get();
+    double angle = 0.0;
+    if(encoderFlipped) {
+        angle = neoEncoder->Get() - turnEncoderOffset;
+
+    } else {
+        angle = turnEncoderOffset - neoEncoder->Get();
+    }
     if(angle < 0.0) angle = 1.0 - angle;
     angle = fabs(1.0 - angle);
     return (angle * DriveConstants::kTurnEncoderDegreesPerPulse) - 180.0;
@@ -105,10 +112,12 @@ double SwerveModule::PlaceInAppropriate0To360Scope(double scopeReference, double
 
 void SwerveModule::SetDesiredState(
     const frc::SwerveModuleState& referenceState) {
+    frc::SwerveModuleState newReference = referenceState; 
+    if(encoderFlipped) newReference.angle = referenceState.angle * -1.0;
 
         // frc::SmartDashboard::PutNumber("FL UNOPTIMIZED Target", (double)referenceState.angle.Degrees());
     // Optimize the reference state to avoid spinning further than 90 degrees*
-    const auto state = Optimize(referenceState, {GetTurnEncoderAngle()});
+    const auto state = Optimize(newReference, {GetTurnEncoderAngle()});
     
     if(usingFalcon) {
         falconTurn->SetControl(rotation.WithPosition(units::angle::turn_t{(double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse}));
